@@ -16,7 +16,20 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    res.send("User logged in");
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(StatusCodes.BAD_REQUEST).send("Please provide email/password");
+    };
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(StatusCodes.UNAUTHORIZED).send("User doesnt exits");
+    }
+
+    const token = user.createJWT()
+    res.status(StatusCodes.OK).send({ user: user.name, token })
+
 }
 
 module.exports = { register, login };
